@@ -31,7 +31,7 @@ export default defineComponent({
           (<any>this.$refs['timer']).innerText = ms;
         },
         onend() {
-          ipcRenderer.invoke('work-stop', {}).then(res => {
+          ipcRenderer.invoke('work-stop', {}).then((res: any) => {
             alert(res);
           });
         },
