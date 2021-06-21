@@ -1,5 +1,4 @@
-import {app, BrowserWindow} from 'electron';
-import {join} from 'path';
+import {app, BrowserWindow, ipcMain, Notification} from 'electron';
 import {URL} from 'url';
 
 
@@ -34,14 +33,17 @@ if (env.MODE === 'development') {
 let mainWindow: BrowserWindow | null = null;
 
 const createWindow = async () => {
-  mainWindow = new BrowserWindow({
+  const options = {
     show: false, // Use 'ready-to-show' event to show window
     webPreferences: {
-      preload: join(__dirname, '../../preload/dist/index.cjs'),
-      contextIsolation: env.MODE !== 'test',   // Spectron tests can't work with contextIsolation: true
-      enableRemoteModule: env.MODE === 'test', // Spectron tests can't work with enableRemoteModule: false
+      //preload: join(__dirname, '../../preload/dist/index.cjs'),
+      nodeIntegration: true,
+      contextIsolation: false,
+      //contextIsolation: env.MODE !== 'test',   // Spectron tests can't work with contextIsolation: true
+      //enableRemoteModule: env.MODE === 'test', // Spectron tests can't work with enableRemoteModule: false
     },
-  });
+  };
+  mainWindow = new BrowserWindow(options);
 
   /**
    * If you install `show: true` then it can cause issues when trying to close the window.
@@ -99,4 +101,13 @@ if (env.PROD) {
     .then(({autoUpdater}) => autoUpdater.checkForUpdatesAndNotify())
     .catch((e) => console.error('Failed check updates:', e));
 }
+
+ipcMain.handle('work-stop', () => {
+  const notification: Notification = new Notification({
+    title: '请选择',
+    body: '工作时间已到，请选择是否继续工作',
+    closeButtonText:'',
+  });
+  notification.show();
+});
 
