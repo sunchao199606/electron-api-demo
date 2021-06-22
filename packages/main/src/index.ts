@@ -1,6 +1,6 @@
+import type { IpcMainInvokeEvent} from 'electron';
 import {app, BrowserWindow, ipcMain, Notification} from 'electron';
 import {URL} from 'url';
-
 
 const isSingleInstance = app.requestSingleInstanceLock();
 
@@ -102,12 +102,15 @@ if (env.PROD) {
     .catch((e) => console.error('Failed check updates:', e));
 }
 
-ipcMain.handle('work-stop', () => {
-  const notification: Notification = new Notification({
-    title: '请选择',
-    body: '工作时间已到，请选择是否继续工作',
-    closeButtonText:'',
+ipcMain.handle('state-changed', (event: IpcMainInvokeEvent, args) => {
+  return new Promise((resolve) => {
+
+    const notification: Notification = new Notification({
+      title: '通知',
+      body: `${args.endedState ? '工作' : '休息'}时间已到，请开始${!args.endedState ? '工作' : '休息'}`,
+    });
+    notification.show();
+    notification.on('click', () => resolve({newState: !args.endedState}));
   });
-  notification.show();
 });
 
