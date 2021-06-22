@@ -28,8 +28,7 @@ export default defineComponent({
       let timer = new Timer({
         tick: 1,
         ontick: (ms: string) => {
-          let text = `正在${options.isWork ? '工作' : '休息'}..剩余${ms}ms`;
-          (<never>this.$refs['timer']).innerText = text;
+          (<never>this.$refs['timer']).innerText = `正在${options.isWork ? '工作' : '休息'}..剩余${ms}ms`;
         },
         async onend() {
           let res = await ipcRenderer.invoke('state-changed', {
