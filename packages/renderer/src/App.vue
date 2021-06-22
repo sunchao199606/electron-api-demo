@@ -22,13 +22,13 @@ const Timer = require('timer.js');
 export default defineComponent({
   name: 'App',
   methods: {
-    setState(options) {
+    setState(options: any) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       let vm = this;
       let timer = new Timer({
         tick: 1,
         ontick: (ms: string) => {
-          (<never>this.$refs['timer']).innerText = `正在${options.isWork ? '工作' : '休息'}..剩余${ms}ms`;
+          (<any>this.$refs['timer']).innerText = `正在${options.isWork ? '工作' : '休息'}..剩余${ms}ms`;
         },
         async onend() {
           let res = await ipcRenderer.invoke('state-changed', {
