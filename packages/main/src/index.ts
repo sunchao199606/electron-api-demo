@@ -1,6 +1,6 @@
-import type { IpcMainInvokeEvent} from 'electron';
-import {app, BrowserWindow, ipcMain, Notification} from 'electron';
+import {app, BrowserWindow} from 'electron';
 import {URL} from 'url';
+import {join} from 'path';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 
@@ -36,11 +36,9 @@ const createWindow = async () => {
   const options = {
     show: false, // Use 'ready-to-show' event to show window
     webPreferences: {
-      //preload: join(__dirname, '../../preload/dist/index.cjs'),
-      nodeIntegration: true,
-      contextIsolation: false,
-      //contextIsolation: env.MODE !== 'test',   // Spectron tests can't work with contextIsolation: true
-      //enableRemoteModule: env.MODE === 'test', // Spectron tests can't work with enableRemoteModule: false
+      preload: join(__dirname, '../../preload/dist/index.cjs'),
+      contextIsolation: env.MODE !== 'test',   // Spectron tests can't work with contextIsolation: true
+      enableRemoteModule: env.MODE === 'test', // Spectron tests can't work with enableRemoteModule: false
     },
   };
   mainWindow = new BrowserWindow(options);
@@ -101,16 +99,4 @@ if (env.PROD) {
     .then(({autoUpdater}) => autoUpdater.checkForUpdatesAndNotify())
     .catch((e) => console.error('Failed check updates:', e));
 }
-
-ipcMain.handle('state-changed', (event: IpcMainInvokeEvent, args) => {
-  return new Promise((resolve) => {
-
-    const notification: Notification = new Notification({
-      title: '通知',
-      body: `${args.endedState ? '工作' : '休息'}时间已到，请开始${!args.endedState ? '工作' : '休息'}`,
-    });
-    notification.show();
-    notification.on('click', () => resolve({newState: !args.endedState}));
-  });
-});
 

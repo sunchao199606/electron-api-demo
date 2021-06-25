@@ -1,4 +1,3 @@
-
 interface ElectronApi {
   readonly versions: Readonly<NodeJS.ProcessVersions>
 }
